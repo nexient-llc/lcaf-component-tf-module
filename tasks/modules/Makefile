@@ -4,6 +4,7 @@ SHELL := /bin/bash
 
 TERRAFORM ?= terraform
 RM ?= rm -rf
+CONFTEST ?= conftest
 REGULA ?= regula
 TFLINT ?= tflint
 FIND ?= find
@@ -12,6 +13,7 @@ FIND ?= find
 
 ALL_TF_MODULES = $(shell $(call list_terraform_modules))
 ALL_EXAMPLES = $(shell $(call list_examples))
+CONFTEST_POLICY_DIRECTORIES ?= $(MODULE_DIR)/policy
 TFLINT_CONFIG ?= .tflint.hcl
 VAR_FILE ?= test.tfvars
 
