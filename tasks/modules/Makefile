@@ -34,12 +34,14 @@ define conftest_terraform_module
 	echo && echo "Conftest $(1) ...";
 	echo $(CONFTEST) test $(1)/terraform.tfplan.json --all-namespaces $(foreach dir,$(CONFTEST_POLICY_DIRECTORIES),$(shell echo "-p $(dir) ")) -p $(MODULE_DIR)/custom_policy/policy;
 	$(CONFTEST) test $(1)/terraform.tfplan.json --all-namespaces $(foreach dir,$(CONFTEST_POLICY_DIRECTORIES),$(shell echo "-p $(dir) ")) -p $(MODULE_DIR)/custom_policy/policy;
+
 endef
 
 define regula_terraform_module
 	echo && echo "Regula $(1) ...";
 	echo $(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan
 	$(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan
+
 endef
 
 define init_terraform_module
@@ -124,8 +126,8 @@ tfmodule/test :
 tfmodule/pre_deploy_test : tfmodule/clone_custom_rules
 	@$(foreach example,$(ALL_EXAMPLES),$(call init_terraform_module,$(example)))
 	@$(foreach example,$(ALL_EXAMPLES),$(call plan_terraform_module,$(example)))
-	@$(foreach example,$(ALL_EXAMPLES),$(call regula_terraform_module,$(example)))
 	@$(foreach example,$(ALL_EXAMPLES),$(call conftest_terraform_module,$(example)))
+	@$(foreach example,$(ALL_EXAMPLES),$(call regula_terraform_module,$(example)))
 
 .PHONY: tfmodule/post_deploy_test
 tfmodule/post_deploy_test :
@@ -144,5 +146,5 @@ check::
 	$(MAKE) tfmodule/lint
 	$(MAKE) tfmodule/clone_custom_rules
 	$(MAKE) tfmodule/plan
-	$(MAKE) tfmodule/test/regula
 	$(MAKE) tfmodule/test/conftest
+	$(MAKE) tfmodule/test/regula
