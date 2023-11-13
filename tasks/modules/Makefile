@@ -16,6 +16,9 @@ ALL_EXAMPLES = $(shell $(call list_examples))
 CONFTEST_POLICY_DIRECTORIES ?= $(MODULE_DIR)/policy
 TFLINT_CONFIG ?= .tflint.hcl
 VAR_FILE ?= test.tfvars
+# Temporary value until we can relocate policies and validate; will be defaulted
+# to 'high' in the future with the option to change this via .cafenv
+REGULA_SEVERITY ?= off 
 
 # Functions
 
@@ -39,8 +42,8 @@ endef
 
 define regula_terraform_module
 	echo && echo "Regula $(1) ...";
-	echo $(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan
-	$(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan
+	echo $(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan --severity $(REGULA_SEVERITY)
+	$(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan --severity $(REGULA_SEVERITY)
 
 endef
 
