@@ -59,8 +59,12 @@ define list_terraform_modules
 endef
 
 define list_examples
-	$(FIND) ./examples -path "*/.terraform" -prune -o -name "main.tf" -not -path '*pipeline*' -exec dirname {} \;;
-
+	filedir="$($(FIND) ./examples -path "*/.terraform" -prune -o -name "main.tf" -not -path '*pipeline*' -exec dirname {} \;;)
+	if [ -n "${filedir}" ]; then
+		echo "${filedir}" | tr ' ' '\n' | sort;
+	else
+        printf 'Oops! Found no file matching \n' >&2
+	fi
 endef
 
 define plan_terraform_module
