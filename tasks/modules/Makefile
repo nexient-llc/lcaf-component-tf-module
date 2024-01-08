@@ -59,8 +59,7 @@ define list_terraform_modules
 endef
 
 define list_examples
-	$(FIND) ./examples -path "*/.terraform" -prune -o -name "main.tf" -not -path '*pipeline*' -exec dirname {} \;;
-
+	$(FIND) ./examples -path "*/.terraform" -prune -o -name "main.tf" -not -path '*pipeline*' -exec dirname {} \; 2>/dev/null
 endef
 
 define plan_terraform_module
@@ -118,11 +117,11 @@ tfmodule/plan : tfmodule/init
 	@$(foreach module,$(ALL_TF_MODULES),$(call plan_terraform_module,$(module)))
 
 .PHONY: tfmodule/test/regula
-tfmodule/test : 
+tfmodule/test/regula : 
 	@$(foreach module,$(ALL_TF_MODULES),$(call regula_terraform_module,$(module)))
 
 .PHONY: tfmodule/test/conftest
-tfmodule/test : 
+tfmodule/test/conftest : 
 	@$(foreach module,$(ALL_TF_MODULES),$(call conftest_terraform_module,$(module)))
 
 .PHONY: tfmodule/pre_deploy_test
