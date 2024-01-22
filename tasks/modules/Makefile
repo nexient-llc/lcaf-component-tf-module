@@ -17,7 +17,7 @@ CONFTEST_POLICY_DIRECTORIES ?= $(MODULE_DIR)/policy
 TFLINT_CONFIG ?= .tflint.hcl
 VAR_FILE ?= test.tfvars
 # Temporary value until we can relocate policies and validate; will be defaulted
-# to 'high' in the future with the option to change this via .cafenv
+# to 'high' in the future with the option to change this via .lcafenv
 REGULA_SEVERITY ?= off 
 
 # Functions
