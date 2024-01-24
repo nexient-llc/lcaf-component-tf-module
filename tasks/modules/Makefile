@@ -114,15 +114,15 @@ tfmodule/list :
 
 .PHONY: tfmodule/plan
 tfmodule/plan : tfmodule/init
-	@$(foreach module,$(ALL_TF_MODULES),$(call plan_terraform_module,$(module)))
+	@$(foreach module,$(ALL_EXAMPLES),$(call plan_terraform_module,$(module)))
 
 .PHONY: tfmodule/test/regula
 tfmodule/test/regula : 
-	@$(foreach module,$(ALL_TF_MODULES),$(call regula_terraform_module,$(module)))
+	@$(foreach module,$(ALL_EXAMPLES),$(call regula_terraform_module,$(module)))
 
 .PHONY: tfmodule/test/conftest
 tfmodule/test/conftest : 
-	@$(foreach module,$(ALL_TF_MODULES),$(call conftest_terraform_module,$(module)))
+	@$(foreach module,$(ALL_EXAMPLES),$(call conftest_terraform_module,$(module)))
 
 .PHONY: tfmodule/pre_deploy_test
 tfmodule/pre_deploy_test : tfmodule/clone_custom_rules
