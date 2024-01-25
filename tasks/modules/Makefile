@@ -42,8 +42,8 @@ endef
 
 define regula_terraform_module
 	echo && echo "Regula $(1) ...";
-	echo $(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan --severity $(REGULA_SEVERITY)
-	$(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan --severity $(REGULA_SEVERITY)
+	echo $(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan --severity $(REGULA_SEVERITY) --include components/policy/policy --include components/policy/waivers --include $(MODULE_DIR)/custom_policy/policy
+	$(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan --severity $(REGULA_SEVERITY) --include components/policy/policy --include components/policy/waivers --include $(MODULE_DIR)/custom_policy/policy
 
 endef
 
