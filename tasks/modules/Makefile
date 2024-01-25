@@ -63,7 +63,7 @@ define list_examples
 endef
 
 define combined_provider
-provider \"aws\" {\n\tregion  = \"us-east-2\"\n\tprofile = \"launch-admin\"\n}\n\nprovider \"azurerm\" {\n\tskip_provider_registration = true\n\tfeatures {\n\t\tresource_group {\n\t\tprevent_deletion_if_contains_resources = false\n\t\t}\n\t}\n}\n
+provider \"aws\" {\n  region  = \"us-east-2\"\n  profile = \"launch-admin\"\n}\n\nprovider \"azurerm\" {\n  skip_provider_registration = true\n  features {\n    resource_group {\n      prevent_deletion_if_contains_resources = false\n    }\n  }\n}\n
 endef
 
 define provider_file_path
