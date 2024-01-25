@@ -66,9 +66,13 @@ define combined_provider
 provider \"aws\" {\n\tregion  = \"us-east-2\"\n\tprofile = \"launch-admin\"\n}\n\nprovider \"azurerm\" {\n\tskip_provider_registration = true\n\tfeatures {\n\t\tresource_group {\n\t\tprevent_deletion_if_contains_resources = false\n\t\t}\n\t}\n}\n
 endef
 
+define provider_file_path
+$(1)/provider.tf
+endef
+
 define create_example_providers
-	echo $(1)
-	bash -c 'echo -e "$(combined_provider)"' > $(1)/provider.tf
+	$(eval PROVIDER_FILE_PATH:=$(call provider_file_path,$(1)))
+	[ -e $(PROVIDER_FILE_PATH) ] || bash -c 'echo -e "$(call combined_provider)"' > $(1)/provider.tf
 endef
 
 define plan_terraform_module
