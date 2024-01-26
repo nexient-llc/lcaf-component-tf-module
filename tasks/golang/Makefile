@@ -59,7 +59,7 @@ go/readonly_test:
 # https://www.gnu.org/software/make/manual/html_node/Double_002dColon.html
 # "check" is a GNU Make pattern that runs tests on configured software
 .PHONY: check
-check::
+check:: tfmodule/plan
 ifeq ($(DISABLE_MAKE_CHECK_LINT),false)
 	$(MAKE) go/lint
 else

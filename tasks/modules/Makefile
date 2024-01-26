@@ -19,6 +19,7 @@ VAR_FILE ?= test.tfvars
 # Temporary value until we can relocate policies and validate; will be defaulted
 # to 'high' in the future with the option to change this via .lcafenv
 REGULA_SEVERITY ?= off 
+CURRENT_DIR = $(notdir $(shell pwd))
 
 # Functions
 
@@ -42,8 +43,8 @@ endef
 
 define regula_terraform_module
 	echo && echo "Regula $(1) ...";
-	echo $(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan --severity $(REGULA_SEVERITY)
-	$(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan --severity $(REGULA_SEVERITY)
+	echo $(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan --severity $(REGULA_SEVERITY) --include components/policy/policy --include components/policy/waivers --include $(MODULE_DIR)/custom_policy/policy
+	$(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan --severity $(REGULA_SEVERITY) --include components/policy/policy --include components/policy/waivers --include $(MODULE_DIR)/custom_policy/policy
 
 endef
 
@@ -60,6 +61,24 @@ endef
 
 define list_examples
 	$(FIND) ./examples -path "*/.terraform" -prune -o -name "main.tf" -not -path '*pipeline*' -exec dirname {} \; 2>/dev/null
+endef
+
+define aws_provider
+provider \"aws\" {\n  region  = \"us-east-2\"\n  profile = \"launch-root-admin\"\n}\n
+endef
+
+define azurerm_provider
+provider \"azurerm\" {\n  skip_provider_registration = true\n  features {\n    resource_group {\n      prevent_deletion_if_contains_resources = false\n    }\n  }\n}\n
+endef
+
+define provider_file_path
+$(1)/provider.tf
+endef
+
+define create_example_providers
+	$(eval PROVIDER_FILE_PATH:=$(call provider_file_path,$(1)))
+	$(if $(findstring aws,$(CURRENT_DIR)), [ -e $(PROVIDER_FILE_PATH) ] || bash -c 'echo -e "$(call aws_provider)"' > $(1)/provider.tf,)
+	$(if $(findstring azure,$(CURRENT_DIR)), [ -e $(PROVIDER_FILE_PATH) ] || bash -c 'echo -e "$(call azure_provider)"' > $(1)/provider.tf,)
 endef
 
 define plan_terraform_module
@@ -98,12 +117,15 @@ tfmodule/fmt :
 .PHONY: tfmodule/init
 tfmodule/init :
 	@$(foreach module,$(ALL_TF_MODULES),$(call init_terraform_module,$(module)))
+	@$(foreach module,$(ALL_EXAMPLES),$(call init_terraform_module,$(module)))
 
 .PHONY: tfmodule/lint
 tfmodule/lint : tfmodule/init
 	@$(call check_terraform_fmt)
 	@$(foreach module,$(ALL_TF_MODULES),$(call tflint_terraform_module,$(module)))
 	@$(foreach module,$(ALL_TF_MODULES),$(call validate_terraform_module,$(module)))
+	@$(foreach module,$(ALL_EXAMPLES),$(call tflint_terraform_module,$(module)))
+	@$(foreach module,$(ALL_EXAMPLES),$(call validate_terraform_module,$(module)))
 
 .PHONY: tfmodule/list
 tfmodule/list :
@@ -114,15 +136,15 @@ tfmodule/list :
 
 .PHONY: tfmodule/plan
 tfmodule/plan : tfmodule/init
-	@$(foreach module,$(ALL_TF_MODULES),$(call plan_terraform_module,$(module)))
+	@$(foreach module,$(ALL_EXAMPLES),$(call plan_terraform_module,$(module)))
 
 .PHONY: tfmodule/test/regula
 tfmodule/test/regula : 
-	@$(foreach module,$(ALL_TF_MODULES),$(call regula_terraform_module,$(module)))
+	@$(foreach module,$(ALL_EXAMPLES),$(call regula_terraform_module,$(module)))
 
 .PHONY: tfmodule/test/conftest
 tfmodule/test/conftest : 
-	@$(foreach module,$(ALL_TF_MODULES),$(call conftest_terraform_module,$(module)))
+	@$(foreach module,$(ALL_EXAMPLES),$(call conftest_terraform_module,$(module)))
 
 .PHONY: tfmodule/pre_deploy_test
 tfmodule/pre_deploy_test : tfmodule/clone_custom_rules
@@ -143,10 +165,15 @@ else
 	git clone $(CUSTOM_POLICY_REPO) $(MODULE_DIR)/custom_policy
 endif
 
+.PHONY: tfmodule/create_example_providers
+tfmodule/create_example_providers:
+	@$(foreach example,$(ALL_EXAMPLES),$(call create_example_providers,$(example)))
+
 .PHONY: check
 check::
 	$(MAKE) tfmodule/lint
 	$(MAKE) tfmodule/clone_custom_rules
+	$(MAKE) tfmodule/create_example_providers
 	$(MAKE) tfmodule/plan
 	$(MAKE) tfmodule/test/conftest
 	$(MAKE) tfmodule/test/regula
