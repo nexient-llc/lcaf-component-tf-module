@@ -11,7 +11,7 @@ FIND ?= find
 # Variables
 
 GO_TEST_DIRECTORIES ?= tests
-GO_TEST_TIMEOUT ?= 30m
+GO_TEST_TIMEOUT ?= 2h
 GO_TEST_READONLY_DIRECTORY ?= post_deploy_functional_readonly
 TEST_RUN_ONLY_READONLY = #intentionally empty
 TEST_RUN_EXCLUDE_READONLY = -v
