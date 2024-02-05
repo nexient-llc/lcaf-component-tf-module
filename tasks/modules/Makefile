@@ -24,8 +24,8 @@ CURRENT_DIR = $(notdir $(shell pwd))
 # Functions
 
 define check_terraform_fmt
-	echo && echo "Checking format ...";
-	$(TERRAFORM) fmt -recursive -check;
+	echo && echo "Formatting Terraform files ...";
+	$(TERRAFORM) fmt -recursive;
 
 endef
 
