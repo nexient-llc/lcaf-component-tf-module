@@ -20,7 +20,7 @@ VAR_FILE ?= test.tfvars
 # to 'high' in the future with the option to change this via .lcafenv
 REGULA_SEVERITY ?= off 
 CURRENT_DIR = $(notdir $(shell pwd))
-AWS_PROFILE ?= launch-root-admin
+AWS_PROFILE ?= default
 AWS_REGION ?= us-east-2
 # Functions
 
