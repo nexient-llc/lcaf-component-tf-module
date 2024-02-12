@@ -20,7 +20,8 @@ VAR_FILE ?= test.tfvars
 # to 'high' in the future with the option to change this via .lcafenv
 REGULA_SEVERITY ?= off 
 CURRENT_DIR = $(notdir $(shell pwd))
-
+AWS_PROFILE ?= launch-root-admin
+AWS_REGION ?= us-east-2
 # Functions
 
 define check_terraform_fmt
@@ -64,7 +65,7 @@ define list_examples
 endef
 
 define aws_provider
-provider \"aws\" {\n  region  = \"us-east-2\"\n  profile = \"launch-root-admin\"\n}\n
+provider \"aws\" {\n  region  = \"$(1)\"\n  profile = \"$(2)\"\n}\n
 endef
 
 define azurerm_provider
@@ -77,7 +78,7 @@ endef
 
 define create_example_providers
 	$(eval PROVIDER_FILE_PATH:=$(call provider_file_path,$(1)))
-	$(if $(findstring aws,$(CURRENT_DIR)), [ -e $(PROVIDER_FILE_PATH) ] || bash -c 'echo -e "$(call aws_provider)"' > $(1)/provider.tf,)
+	$(if $(findstring aws,$(CURRENT_DIR)), [ -e $(PROVIDER_FILE_PATH) ] || bash -c 'echo -e "$(call aws_provider,$(AWS_REGION),$(AWS_PROFILE))"' > $(1)/provider.tf,)
 	$(if $(findstring azure,$(CURRENT_DIR)), [ -e $(PROVIDER_FILE_PATH) ] || bash -c 'echo -e "$(call azure_provider)"' > $(1)/provider.tf,)
 endef
 
