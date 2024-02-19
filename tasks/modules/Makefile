@@ -13,7 +13,7 @@ FIND ?= find
 
 ALL_TF_MODULES = $(shell $(call list_terraform_modules))
 ALL_EXAMPLES = $(shell $(call list_examples))
-CONFTEST_POLICY_DIRECTORIES ?= $(MODULE_DIR)/policy
+POLICY_DIRECTORY ?= components/policy
 TFLINT_CONFIG ?= .tflint.hcl
 VAR_FILE ?= test.tfvars
 # Temporary value until we can relocate policies and validate; will be defaulted
@@ -37,15 +37,15 @@ endef
 
 define conftest_terraform_module
 	echo && echo "Conftest $(1) ...";
-	echo $(CONFTEST) test $(1)/terraform.tfplan.json --all-namespaces $(foreach dir,$(CONFTEST_POLICY_DIRECTORIES),$(shell echo "-p $(dir) ")) -p $(MODULE_DIR)/custom_policy/policy;
-	$(CONFTEST) test $(1)/terraform.tfplan.json --all-namespaces $(foreach dir,$(CONFTEST_POLICY_DIRECTORIES),$(shell echo "-p $(dir) ")) -p $(MODULE_DIR)/custom_policy/policy;
+	echo $(CONFTEST) test $(1)/terraform.tfplan.json --all-namespaces -p $(POLICY_DIRECTORY) -p $(MODULE_DIR)/custom_policy/policy;
+	$(CONFTEST) test $(1)/terraform.tfplan.json --all-namespaces -p $(POLICY_DIRECTORY) -p $(MODULE_DIR)/custom_policy/policy;
 
 endef
 
 define regula_terraform_module
 	echo && echo "Regula $(1) ...";
-	echo $(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan --severity $(REGULA_SEVERITY) --include components/policy/policy --include components/policy/waivers --include $(MODULE_DIR)/custom_policy/policy
-	$(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan --severity $(REGULA_SEVERITY) --include components/policy/policy --include components/policy/waivers --include $(MODULE_DIR)/custom_policy/policy
+	echo $(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan --severity $(REGULA_SEVERITY) --include $(POLICY_DIRECTORY) --include $(MODULE_DIR)/custom_policy/policy
+	$(REGULA) run $(1)/terraform.tfplan.json --input-type tf-plan --severity $(REGULA_SEVERITY) --include $(POLICY_DIRECTORY) --include $(MODULE_DIR)/custom_policy/policy
 
 endef
 
@@ -79,7 +79,7 @@ endef
 define create_example_providers
 	$(eval PROVIDER_FILE_PATH:=$(call provider_file_path,$(1)))
 	$(if $(findstring aws,$(CURRENT_DIR)), [ -e $(PROVIDER_FILE_PATH) ] || bash -c 'echo -e "$(call aws_provider,$(AWS_REGION),$(AWS_PROFILE))"' > $(1)/provider.tf,)
-	$(if $(findstring azure,$(CURRENT_DIR)), [ -e $(PROVIDER_FILE_PATH) ] || bash -c 'echo -e "$(call azure_provider)"' > $(1)/provider.tf,)
+	$(if $(findstring azure,$(CURRENT_DIR)), [ -e $(PROVIDER_FILE_PATH) ] || bash -c 'echo -e "$(call azurerm_provider)"' > $(1)/provider.tf,)
 endef
 
 define plan_terraform_module
