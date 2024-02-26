@@ -51,18 +51,13 @@ go/test :
 go/readonly_test:
 	$(foreach test_dir,$(GO_TEST_DIRECTORIES),$(call go_test,$(test_dir),$(TEST_RUN_ONLY_READONLY)))
 
-	
-
-# This is a special declaration
-# Whenever check is defined, it must be defined with a ::
-# _all_ check targets that are found will be run
-# https://www.gnu.org/software/make/manual/html_node/Double_002dColon.html
-# "check" is a GNU Make pattern that runs tests on configured software
-.PHONY: check
-check:: tfmodule/plan
+.PHONY: lint
+lint::
 ifeq ($(DISABLE_MAKE_CHECK_LINT),false)
 	$(MAKE) go/lint
 else
 	$(info "make go/lint has been disabled!")
-endif
+
+.PHONY: test
+test:: tfmodule/plan
 	$(MAKE) go/test
