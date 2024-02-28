@@ -105,7 +105,7 @@ endef
 # Tasks
 
 .PHONY: tfmodule/all
-tfmodule/all: check
+tfmodule/all: lint
 
 .PHONY: tfmodule/clean
 tfmodule/clean :
@@ -170,8 +170,8 @@ endif
 tfmodule/create_example_providers:
 	@$(foreach example,$(ALL_EXAMPLES),$(call create_example_providers,$(example)))
 
-.PHONY: check
-check::
+.PHONY: lint
+lint::
 	$(MAKE) tfmodule/lint
 	$(MAKE) tfmodule/clone_custom_rules
 	$(MAKE) tfmodule/create_example_providers
